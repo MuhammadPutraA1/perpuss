@@ -1,11 +1,37 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Bell } from "lucide-react";
+import { Search } from "lucide-react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 export default function Layout({ children }) {
   const pathname = usePathname();
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Load pertama kali
+    const saved = localStorage.getItem("user");
+    if (saved) {
+      setUser(JSON.parse(saved));
+    }
+
+    // 🔥 Dengarkan event update user
+    const handleUpdate = () => {
+      const updated = localStorage.getItem("user");
+      if (updated) {
+        setUser(JSON.parse(updated));
+      }
+    };
+
+    window.addEventListener("user-updated", handleUpdate);
+
+    // Bersihkan listener saat komponen unmount
+    return () => {
+      window.removeEventListener("user-updated", handleUpdate);
+    };
+  }, []);
 
   const menu = [
     { name: "Discover", path: "/user/homepage" },
@@ -26,7 +52,11 @@ export default function Layout({ children }) {
               <Link
                 key={item.path}
                 href={item.path}
-                className={`px-3 py-2 rounded-lg transition  ${active ? "bg-teal-500 text-white font-semibold" : "hover:bg-gray-100"}`}>
+                className={`px-3 py-2 rounded-lg transition ${active
+                    ? "bg-teal-500 text-white font-semibold"
+                    : "hover:bg-gray-100"
+                  }`}
+              >
                 {item.name}
               </Link>
             );
@@ -35,26 +65,32 @@ export default function Layout({ children }) {
       </aside>
 
       <div className="flex-1 flex flex-col">
-
         <div className="w-full bg-white shadow py-4 px-12 flex items-center justify-between">
           <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-xl w-96">
             <Search className="w-5 h-5 text-gray-500" />
-            <input type="text" placeholder="Search a books" className="bg-transparent outline-none flex-1"/>
+            <input
+              type="text"
+              placeholder="Search a books"
+              className="bg-transparent outline-none flex-1"
+            />
           </div>
 
           <div className="flex items-center gap-8">
-            <Link href="/user/homepage/profile" className="flex items-center gap-3 cursor-pointer">
+            <Link
+              href="/user/homepage/profile"
+              className="flex items-center gap-3 cursor-pointer"
+            >
               <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
               <div className="flex flex-col">
-                <h2 className="text-sm font-semibold">Vynns</h2>
+                <h2 className="text-sm font-semibold">
+                  {user ? user.username : "User"}
+                </h2>
               </div>
             </Link>
           </div>
         </div>
 
-        <main className="flex-1 p-6 overflow-y-auto">
-          {children}
-        </main>
+        <main className="flex-1 p-6 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

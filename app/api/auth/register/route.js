@@ -1,5 +1,5 @@
-import getDb from "@/lib/db";
-import bcrypt from "bcryptjs";
+import getDb from "@/app/lib/database";
+import bcrypt from "bcrypt";
 
 export async function POST(req) {
   try {

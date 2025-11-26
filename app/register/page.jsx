@@ -1,57 +1,145 @@
 "use client";
-import React from "react";
-import Image from "next/image";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
-    return (
-        <div className="relative min-h-screen flex items-center justify-center p-6 overflow-hidden">
-            <div className="absolute inset-0 bg-cover bg-center blur-sm" style={{ backgroundImage: "url('/assets/library.jpeg')" }} />
-            <div className="absolute inset-0 bg-black/40"></div>
-            <div className="relative z-10 bg-white shadow-2xl rounded-2xl flex flex-col md:flex-row w-full max-w-4xl overflow-hidden">
-                <div className="w-full md:w-1/2 p-8">
-                    <h1 className="text-3xl font-bold text-teal-500 mb-6 text-center">Daftar</h1>
+  const router = useRouter();
 
-                    <form className="space-y-5">
-                        <div>
-                            <label className="block text-teal-700 font-semibold mb-2">Username</label>
-                            <input type="password" name="Username" placeholder="Masukkan Username" className="w-full px-4 py-2 border border-sky-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 text-black placeholder-gray-400" required />
-                        </div>
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-                        <div>
-                            <label className="block text-teal-700 font-semibold mb-2">Email</label>
-                            <input type="Email" name="Email" placeholder="Masukkan email" className="w-full px-4 py-2 border border-sky-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 text-black placeholder-gray-400" required />
-                        </div>
+  const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
-                        <div>
-                            <label className="block text-teal-700 font-semibold mb-2">Kata Sandi</label>
-                            <input type="password" name="password" placeholder="Masukkan kata sandi" className="w-full px-4 py-2 border border-sky-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 text-black placeholder-gray-400" required />
-                        </div>
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setErrorMsg("");
+    setLoading(true);
 
-                        <Button variant={ "destructive" }>Masuk</Button>
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+          role: "user",
+        }),
+      });
 
-                        <p className="text-center text-sm text-gray-600 mt-4">
-                            Sudah punya akun?{" "}
-                            <a href="/login" className="text-teal-600 hover:underline">
-                                Masuk di sini
-                            </a>
-                        </p>
-                    </form>
-                </div>
+      const data = await res.json();
 
+      if (!res.ok) {
+        setErrorMsg(data.message || "Gagal mendaftar");
+        setLoading(false);
+        return;
+      }
 
-                <div
-                    className="hidden md:block md:w-1/2 relative bg-cover bg-center"
-                    style={{ backgroundImage: "url('/assets/libraryy.jpeg')" }}
-                >
+      router.push("/login");
+    } catch (error) {
+      console.log(error);
+      setErrorMsg("Terjadi kesalahan server");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                        <h2 className="text-white text-2xl font-semibold text-center px-4">
-                            Selamat Datang Di KaguLib
-                        </h2>
-                    </div>
-                </div>
+  return (
+    <div className="relative min-h-screen flex items-center justify-center p-6 overflow-hidden">
+      <div
+        className="absolute inset-0 bg-cover bg-center blur-sm"
+        style={{ backgroundImage: "url('/assets/library.jpeg')" }}
+      />
+      <div className="absolute inset-0 bg-black/40"></div>
+
+      <div className="relative z-10 bg-white shadow-2xl rounded-2xl flex flex-col md:flex-row w-full max-w-4xl overflow-hidden">
+
+        <div className="w-full md:w-1/2 p-8">
+          <h1 className="text-3xl font-bold text-teal-500 mb-6 text-center">
+            Daftar
+          </h1>
+
+          {errorMsg && (
+            <p className="text-red-600 text-center font-medium">{errorMsg}</p>
+          )}
+
+          <form className="space-y-5" onSubmit={handleRegister}>
+
+            <div>
+              <label className="block text-teal-700 font-semibold mb-2">
+                Username
+              </label>
+              <input
+                type="text"
+                placeholder="Masukkan Username"
+                className="w-full px-4 py-2 border border-sky-300 rounded-lg focus:ring-2 focus:ring-sky-500 text-black"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
             </div>
+
+            <div>
+              <label className="block text-teal-700 font-semibold mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                placeholder="Masukkan Email"
+                className="w-full px-4 py-2 border border-sky-300 rounded-lg focus:ring-2 focus:ring-sky-500 text-black"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-teal-700 font-semibold mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                placeholder="Masukkan Kata Sandi"
+                className="w-full px-4 py-2 border border-sky-300 rounded-lg focus:ring-2 focus:ring-sky-500 text-black"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <Button
+              type="submit"
+              variant="destructive"
+              disabled={loading}
+              className="w-full"
+            >
+              {loading ? "Loading..." : "Daftar"}
+            </Button>
+
+            <p className="text-center text-sm text-gray-600 mt-4">
+              Sudah punya akun?{" "}
+              <a href="/login" className="text-teal-600 hover:underline">
+                Masuk di sini
+              </a>
+            </p>
+          </form>
         </div>
-    );
+
+        <div
+          className="hidden md:block md:w-1/2 relative bg-cover bg-center"
+          style={{ backgroundImage: "url('/assets/libraryy.jpeg')" }}
+        >
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <h2 className="text-white text-2xl font-semibold">
+              Selamat Datang Di KaguLib
+            </h2>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
 }

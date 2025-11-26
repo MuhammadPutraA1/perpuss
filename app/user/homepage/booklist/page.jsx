@@ -32,7 +32,7 @@ export default function BookList() {
           >
             <CardContent className="p-0">
               
-              <div className="w-full h-90 overflow-hidden">
+              <div className="w-full h-80 overflow-hidden">
                 <img
                   src={`/buku/coverbuku/${book.gambar}`}
                   alt={book.judul}
