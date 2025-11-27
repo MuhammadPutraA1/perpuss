@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
@@ -27,21 +26,23 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setErrorMsg(data.message || "Login gagal");
-        setLoading(false);
-        return;
-      }
+  setErrorMsg(data.message || "Login gagal");
+  setLoading(false);
+  return;
+}
 
-      // 💾 SIMPAN TOKEN
-      localStorage.setItem("token", data.token);
+// 🔥 Simpan user ke localStorage
+localStorage.setItem("user", JSON.stringify(data.user));
 
-      // 💾 SIMPAN DATA USER (USERNAME, EMAIL, ROLE, ID, DLL)
-      if (data.user) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-      }
+// 🔥 Trigger event agar layout update
+window.dispatchEvent(new Event("user-updated"));
 
-      // 🔀 Arahkan ke homepage user
-      router.push("/user/homepage");
+// redirect berdasarkan role
+if (data.user.role === "admin") {
+  router.push("/dashboard");
+} else {
+  router.push("/user/homepage");
+}
 
     } catch (error) {
       setErrorMsg("Terjadi kesalahan server");
@@ -70,9 +71,7 @@ export default function LoginPage() {
 
           <form className="space-y-5" onSubmit={handleLogin}>
             <div>
-              <label className="block text-teal-700 font-semibold mb-2">
-                Email
-              </label>
+              <label className="block text-teal-700 font-semibold mb-2">Email</label>
               <input
                 type="email"
                 placeholder="Masukkan Email..."
@@ -84,9 +83,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-teal-700 font-semibold mb-2">
-                Password
-              </label>
+              <label className="block text-teal-700 font-semibold mb-2">Password</label>
               <input
                 type="password"
                 placeholder="Masukkan Password..."
@@ -97,12 +94,7 @@ export default function LoginPage() {
               />
             </div>
 
-            <Button
-              type="submit"
-              variant="destructive"
-              disabled={loading}
-              className="w-full"
-            >
+            <Button type="submit" disabled={loading} className="w-full bg-teal-600 hover:bg-teal-700">
               {loading ? "Loading..." : "Login"}
             </Button>
 

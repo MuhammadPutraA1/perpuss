@@ -36,7 +36,7 @@ export default function Layout({ children }) {
   const menu = [
     { name: "Discover", path: "/user/homepage" },
     { name: "Category", path: "/user/homepage/category" },
-    { name: "Book List", path: "/user/homepage/buku" },
+    { name: "Book List", path: "/user/homepage/booklist" },
     { name: "Favorite", path: "/user/homepage/favorite" },
     { name: "Settings", path: "/user/homepage/settings" },
   ];

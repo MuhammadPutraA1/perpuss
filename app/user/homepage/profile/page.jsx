@@ -22,7 +22,7 @@ export default function ProfilePage() {
   const handleSave = async () => {
     const token = localStorage.getItem("token");
 
-    const res = await fetch("/api/auth/update", {
+    const res = await fetch("/api/users/update", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

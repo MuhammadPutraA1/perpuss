@@ -1,67 +1,68 @@
-import getDb from "@/app/lib/database";
-import bcrypt from "bcrypt";
+import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import getDb from "@/app/lib/database";
 
 export async function POST(req) {
   try {
-    const { email, password } = await req.json();
-    const db = await getDb();
+    const db = await getDb();   // <-- FIX
 
-    // CARI EMAIL
+    const { email, password } = await req.json();
+
     const [rows] = await db.query(
-      "SELECT * FROM users WHERE email = ?",
+      "SELECT id_users AS id, username, email, password, role FROM users WHERE email = ? LIMIT 1",
       [email]
     );
 
     if (rows.length === 0) {
-      return Response.json(
+      return NextResponse.json(
         { message: "Email tidak ditemukan" },
-        { status: 400 }
+        { status: 401 }
       );
     }
 
     const user = rows[0];
 
-    // CEK PASSWORD
-    const validPass = await bcrypt.compare(password, user.password);
-    if (!validPass) {
-      return Response.json(
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return NextResponse.json(
         { message: "Password salah" },
-        { status: 400 }
+        { status: 401 }
       );
     }
 
-    // BUAT TOKEN JWT
     const token = jwt.sign(
       {
-        id_users: user.id_users,
-        email: user.email,
+        id: user.id,
         role: user.role,
-        username: user.username,
+        email: user.email,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    // KIRIM DATA USER
-    return Response.json(
-      {
-        message: "Login berhasil",
-        token,
-        user: {
-          id_users: user.id_users,
-          username: user.username,
-          email: user.email,
-          role: user.role,
-          jenis_kelamin: user.jenis_kelamin
-        }
+    const response = NextResponse.json({
+      message: "Login berhasil",
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
       },
-      { status: 200 }
-    );
+    });
 
-  } catch (err) {
-    console.error("LOGIN ERROR:", err);
-    return Response.json(
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24,
+      path: "/",
+    });
+
+    return response;
+
+  } catch (error) {
+    console.error("LOGIN ERROR:", error);
+    return NextResponse.json(
       { message: "Server error" },
       { status: 500 }
     );
