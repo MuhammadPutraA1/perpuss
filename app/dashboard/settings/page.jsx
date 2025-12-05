@@ -28,7 +28,7 @@ export default function SettingsPage() {
     <div className="p-6 space-y-6">
       <div className="space-y-4">
         {settings.map((item, i) => (
-          <Card 
+          <Card
             key={i}
             className="cursor-pointer hover:bg-gray-100 transition"
             onClick={item.onClick}
@@ -47,26 +47,26 @@ export default function SettingsPage() {
       </div>
 
       <button
-  className="w-full py-3 mt-6 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600"
-  onClick={async () => {
-    // 1. Panggil API untuk hapus cookie
-    await fetch("/api/auth/logout", { method: "POST" });
+        className="w-full py-3 mt-6 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600"
+        onClick={async () => {
+          // 1. Panggil API untuk hapus cookie
+          await fetch("/api/auth/logout", { method: "POST" });
 
-    // 2. Hapus localStorage user
-    localStorage.removeItem("user");
+          // 2. Hapus localStorage user
+          localStorage.removeItem("user");
 
-    // 3. Trigger event ke layout
-    window.dispatchEvent(new Event("user-updated"));
+          // 3. Trigger event ke layout
+          window.dispatchEvent(new Event("user-updated"));
 
-    // 4. Redirect ke login
-    window.location.href = "/login";
-  }}
->
-  <div className="flex items-center justify-center gap-2">
-    <LogOut size={18} />
-    Logout
-  </div>
-</button>
+          // 4. Redirect ke login
+          window.location.href = "/login";
+        }}
+      >
+        <div className="flex items-center justify-center gap-2">
+          <LogOut size={18} />
+          Logout
+        </div>
+      </button>
     </div>
   )
 }

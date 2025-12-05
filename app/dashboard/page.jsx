@@ -19,7 +19,7 @@ export default function DashboardPage() {
         console.log("🔍 Fetching users...");
         const usersRes = await fetch("/api/users");
         console.log("📡 Users response status:", usersRes.status);
-        
+
         if (!usersRes.ok) {
           console.error("❌ Users API error:", await usersRes.text());
           throw new Error("Failed to fetch users");
@@ -31,7 +31,7 @@ export default function DashboardPage() {
         console.log("🔍 Fetching books...");
         const booksRes = await fetch("/api/buku");
         console.log("📡 Books response status:", booksRes.status);
-        
+
         if (!booksRes.ok) {
           console.error("❌ Books API error:", await booksRes.text());
           throw new Error("Failed to fetch books");
@@ -43,7 +43,7 @@ export default function DashboardPage() {
         console.log("🔍 Fetching active loans...");
         const loansRes = await fetch("/api/peminjaman/active");
         console.log("📡 Loans response status:", loansRes.status);
-        
+
         if (!loansRes.ok) {
           console.error("❌ Loans API error:", await loansRes.text());
           throw new Error("Failed to fetch active loans");

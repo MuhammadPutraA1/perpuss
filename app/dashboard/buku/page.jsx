@@ -7,18 +7,22 @@ export default function DashboardBukuPage() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [formData, setFormData] = useState({
+    id_buku: "",
     judul: "",
     penulis: "",
     penerbit: "",
     tahun: "",
     isbn: "",
     kategori: "",
+    id_kategori: "",
     stok: "",
     total_halaman: "",
     deskripsi: "",
     id_rak: "",
+    gambar_lama: "",
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -62,41 +66,110 @@ export default function DashboardBukuPage() {
     }));
   };
 
+  const handleEdit = (book) => {
+    setEditMode(true);
+    setFormData({
+      id_buku: book.id_buku,
+      judul: book.judul,
+      penulis: book.penulis,
+      penerbit: book.penerbit,
+      tahun: book.tahun,
+      isbn: book.isbn,
+      kategori: book.kategori || "",
+      id_kategori: book.id_kategori || "",
+      stok: book.stok,
+      total_halaman: book.total_halaman || "",
+      deskripsi: book.deskripsi || "",
+      id_rak: book.id_rak || "",
+      gambar_lama: book.gambar || "",
+    });
+    setImagePreview(`/buku/coverbuku/${book.gambar}`);
+    setShowModal(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
     try {
-      const formDataToSend = new FormData();
-      
-      Object.keys(formData).forEach((key) => {
-        if (formData[key]) {
-          formDataToSend.append(key, formData[key]);
+      if (editMode) {
+        // UPDATE MODE - Pakai FormData seperti POST supaya bisa handle kategori dengan benar
+        const formDataToSend = new FormData();
+        
+        formDataToSend.append("id_buku", formData.id_buku);
+        formDataToSend.append("isbn", formData.isbn);
+        formDataToSend.append("judul", formData.judul);
+        formDataToSend.append("deskripsi", formData.deskripsi);
+        formDataToSend.append("penulis", formData.penulis);
+        formDataToSend.append("penerbit", formData.penerbit);
+        formDataToSend.append("total_halaman", formData.total_halaman || 0);
+        formDataToSend.append("tahun", formData.tahun);
+        formDataToSend.append("stok", formData.stok);
+        
+        if (formData.id_rak) {
+          formDataToSend.append("id_rak", formData.id_rak);
         }
-      });
+        
+        // Kirim nama kategori, biar API yang handle
+        if (formData.kategori) {
+          formDataToSend.append("kategori", formData.kategori);
+        }
+        
+        // Kirim gambar baru jika ada
+        if (imageFile) {
+          formDataToSend.append("gambar", imageFile);
+        } else {
+          // Kirim gambar lama supaya tidak berubah
+          formDataToSend.append("gambar_lama", formData.gambar_lama);
+        }
 
-      if (imageFile) {
-        formDataToSend.append("gambar", imageFile);
+        const res = await fetch("/api/buku/update", {
+          method: "PUT",
+          body: formDataToSend,
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          throw new Error(result.message || "Gagal mengupdate buku");
+        }
+
+        alert("✅ Buku berhasil diupdate!");
+        
+      } else {
+        // ADD MODE
+        const formDataToSend = new FormData();
+        
+        Object.keys(formData).forEach((key) => {
+          if (formData[key] && key !== 'id_buku' && key !== 'gambar_lama') {
+            formDataToSend.append(key, formData[key]);
+          }
+        });
+
+        if (imageFile) {
+          formDataToSend.append("gambar", imageFile);
+        }
+
+        const res = await fetch("/api/buku", {
+          method: "POST",
+          body: formDataToSend,
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          throw new Error(result.message || "Gagal menambah buku");
+        }
+
+        alert("✅ Buku berhasil ditambahkan!");
       }
 
-      const res = await fetch("/api/buku", {
-        method: "POST",
-        body: formDataToSend,
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result.message || "Gagal menambah buku");
-      }
-
-      alert("✅ Buku berhasil ditambahkan!");
       setShowModal(false);
       resetForm();
       fetchBooks();
 
     } catch (error) {
-      console.error("Error adding book:", error);
+      console.error("Error saving book:", error);
       alert("❌ " + error.message);
     } finally {
       setSubmitting(false);
@@ -122,17 +195,21 @@ export default function DashboardBukuPage() {
   };
 
   const resetForm = () => {
+    setEditMode(false);
     setFormData({
+      id_buku: "",
       judul: "",
       penulis: "",
       penerbit: "",
       tahun: "",
       isbn: "",
       kategori: "",
+      id_kategori: "",
       stok: "",
       total_halaman: "",
       deskripsi: "",
       id_rak: "",
+      gambar_lama: "",
     });
     setImageFile(null);
     setImagePreview(null);
@@ -149,7 +226,11 @@ export default function DashboardBukuPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Kelola Buku</h1>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={() => {
+            setEditMode(false);
+            resetForm();
+            setShowModal(true);
+          }}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition"
         >
           <Plus size={20} />
@@ -227,7 +308,7 @@ export default function DashboardBukuPage() {
                         <button 
                           className="text-blue-600 hover:text-blue-800" 
                           title="Edit"
-                          onClick={() => alert("Fitur edit coming soon!")}
+                          onClick={() => handleEdit(book)}
                         >
                           <Edit2 size={18} />
                         </button>
@@ -252,7 +333,9 @@ export default function DashboardBukuPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-5 border-b sticky top-0 bg-white">
-              <h2 className="text-xl font-bold">Tambah Buku Baru</h2>
+              <h2 className="text-xl font-bold">
+                {editMode ? "Edit Buku" : "Tambah Buku Baru"}
+              </h2>
               <button
                 onClick={() => {
                   setShowModal(false);
@@ -268,7 +351,7 @@ export default function DashboardBukuPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Cover Buku
+                    Cover Buku {editMode && <span className="text-xs text-gray-500">(biarkan kosong jika tidak ingin mengubah)</span>}
                   </label>
                   <div className="flex items-center gap-4">
                     {imagePreview ? (
@@ -289,7 +372,9 @@ export default function DashboardBukuPage() {
                         onChange={handleImageChange}
                         className="hidden"
                       />
-                      <span className="text-sm text-gray-700">Pilih Gambar</span>
+                      <span className="text-sm text-gray-700">
+                        {editMode ? "Ganti Gambar" : "Pilih Gambar"}
+                      </span>
                     </label>
                   </div>
                 </div>
@@ -415,7 +500,7 @@ export default function DashboardBukuPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    ID Rak
+                    ID Rak (opsional)
                   </label>
                   <input
                     type="number"
@@ -457,7 +542,7 @@ export default function DashboardBukuPage() {
                   disabled={submitting}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400"
                 >
-                  {submitting ? "Menyimpan..." : "Simpan Buku"}
+                  {submitting ? "Menyimpan..." : editMode ? "Update Buku" : "Simpan Buku"}
                 </button>
               </div>
             </div>

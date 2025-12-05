@@ -31,6 +31,11 @@ export default function AdminSidebar({ isOpen, setIsOpen }) {
             <Library size={20} /> Kelola buku
           </Link>
         </li>
+         <li>
+          <Link href="/dashboard/kelolauser" className="flex items-center gap-3 p-2 hover:bg-gray-700 rounded">
+            <Users size={20} /> Kelola user
+          </Link>
+        </li>
         <li>
             <Link href="/dashboard/settings">
           <button className="flex items-center gap-3 p-2 hover:bg-red-600 rounded mt-5 w-full text-left">
