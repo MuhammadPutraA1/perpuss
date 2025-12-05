@@ -20,33 +20,35 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // ✅ Penting untuk cookie
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-  setErrorMsg(data.message || "Login gagal");
-  setLoading(false);
-  return;
-}
+        setErrorMsg(data.message || "Login gagal");
+        setLoading(false);
+        return;
+      }
 
-// 🔥 Simpan user ke localStorage
-localStorage.setItem("user", JSON.stringify(data.user));
+      // ✅ Simpan user ke localStorage
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-// 🔥 Trigger event agar layout update
-window.dispatchEvent(new Event("user-updated"));
+      // ✅ Trigger event agar layout update
+      window.dispatchEvent(new Event("user-updated"));
 
-// redirect berdasarkan role
-if (data.user.role === "admin") {
-  router.push("/dashboard");
-} else {
-  router.push("/user/homepage");
-}
+      // ✅ Gunakan window.location.href untuk full page reload
+      // Ini memastikan cookie sudah ter-set sebelum middleware dijalankan
+      if (data.user.role === "admin") {
+        window.location.href = "/dashboard";
+      } else {
+        window.location.href = "/user/homepage";
+      }
 
     } catch (error) {
+      console.error("Login error:", error);
       setErrorMsg("Terjadi kesalahan server");
-    } finally {
       setLoading(false);
     }
   };
@@ -66,12 +68,16 @@ if (data.user.role === "admin") {
           </h1>
 
           {errorMsg && (
-            <p className="text-red-600 font-medium text-center mb-2">{errorMsg}</p>
+            <p className="text-red-600 font-medium text-center mb-2">
+              {errorMsg}
+            </p>
           )}
 
           <form className="space-y-5" onSubmit={handleLogin}>
             <div>
-              <label className="block text-teal-700 font-semibold mb-2">Email</label>
+              <label className="block text-teal-700 font-semibold mb-2">
+                Email
+              </label>
               <input
                 type="email"
                 placeholder="Masukkan Email..."
@@ -83,7 +89,9 @@ if (data.user.role === "admin") {
             </div>
 
             <div>
-              <label className="block text-teal-700 font-semibold mb-2">Password</label>
+              <label className="block text-teal-700 font-semibold mb-2">
+                Password
+              </label>
               <input
                 type="password"
                 placeholder="Masukkan Password..."
@@ -94,7 +102,11 @@ if (data.user.role === "admin") {
               />
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full bg-teal-600 hover:bg-teal-700">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-teal-600 hover:bg-teal-700"
+            >
               {loading ? "Loading..." : "Login"}
             </Button>
 

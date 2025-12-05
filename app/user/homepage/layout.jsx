@@ -38,6 +38,7 @@ export default function Layout({ children }) {
     { name: "Category", path: "/user/homepage/category" },
     { name: "Book List", path: "/user/homepage/buku" },
     { name: "Favorite", path: "/user/homepage/favorite" },
+    { name: "Peminjaman", path: "/user/homepage/peminjaman" },  
     { name: "Settings", path: "/user/homepage/settings" },
   ];
 

@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import getDb from "@/app/lib/database";
 
-export async function GET(req, { params }) {
+export async function GET(req, context) {
   try {
+    const params = await context.params;
+    console.log("RAW PARAMS:", params);
+
+    const id = params.id;
+    console.log("ID YANG DITERIMA:", id);
+
     const db = await getDb();
-    const { id } = params;
 
     const [rows] = await db.query(
       `SELECT 
@@ -26,7 +31,10 @@ export async function GET(req, { params }) {
       [id]
     );
 
+    console.log("HASIL QUERY:", rows);
+
     if (rows.length === 0) {
+      console.log("BUKU TIDAK DITEMUKAN");
       return NextResponse.json(
         { message: "Buku tidak ditemukan" },
         { status: 404 }
