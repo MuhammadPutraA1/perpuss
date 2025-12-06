@@ -10,12 +10,7 @@ export default function SettingsPage() {
       icon: <Bell size={20} />,
       onClick: () => console.log("Notification clicked"),
     },
-    {
-      title: "Privacy & Security",
-      desc: "Permissions, password, security",
-      icon: <Shield size={20} />,
-      onClick: () => console.log("Privacy clicked"),
-    },
+
     {
       title: "Language",
       desc: "Change app language",

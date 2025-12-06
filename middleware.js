@@ -24,7 +24,6 @@ export async function middleware(req) {
 
   let decoded;
   try {
-    // ✅ Gunakan jose (Edge Runtime compatible)
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const { payload } = await jwtVerify(token, secret);
     
@@ -35,11 +34,6 @@ export async function middleware(req) {
 
   // ADMIN ONLY
   if (path.startsWith("/dashboard") && decoded.role !== "admin") {
-    return NextResponse.redirect(new URL("/forbidden", req.url));
-  }
-
-  // USER ONLY
-  if (path.startsWith("/user") && decoded.role !== "user") {
     return NextResponse.redirect(new URL("/forbidden", req.url));
   }
 

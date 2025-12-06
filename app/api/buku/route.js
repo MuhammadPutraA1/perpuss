@@ -6,10 +6,25 @@ import path from "path";
 // ==== GET: FETCH ALL BOOKS ====
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const limit = parseInt(searchParams.get("limit")) || 100;
+  const limitParam = parseInt(searchParams.get("limit"), 10);
+  const limit = Number.isNaN(limitParam) ? 100 : limitParam;
+  const kategoriParamRaw = searchParams.get("kategori");
+  const kategoriFilterProvided =
+    kategoriParamRaw !== null && kategoriParamRaw !== undefined && kategoriParamRaw !== "";
+  const kategoriId = kategoriFilterProvided
+    ? parseInt(kategoriParamRaw, 10)
+    : null;
 
   try {
     const db = await getDb();
+    const params = [];
+    let whereClause = "";
+
+    if (kategoriFilterProvided && !Number.isNaN(kategoriId)) {
+      whereClause = "WHERE b.id_kategori = ?";
+      params.push(kategoriId);
+    }
+
     const [rows] = await db.query(`
       SELECT 
         b.id_buku,
@@ -29,9 +44,10 @@ export async function GET(request) {
       FROM buku b
       LEFT JOIN kategori_buku k 
         ON k.id_kategori = b.id_kategori
+      ${whereClause}
       ORDER BY b.dibuat_pada DESC
       LIMIT ?
-    `, [limit]);
+    `, [...params, limit]);
 
     return NextResponse.json(rows);
 

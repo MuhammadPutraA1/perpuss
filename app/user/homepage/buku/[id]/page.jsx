@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { BookUser } from "lucide-react";
+import LoanModal from "@/components/modal/loanModal";
 
 export default function DetailBukuPage() {
   const { id } = useParams();
@@ -10,7 +11,6 @@ export default function DetailBukuPage() {
   
   const [books, setBooks] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
 
   // ==== GET USER FROM LOCALSTORAGE ====
@@ -81,68 +81,11 @@ export default function DetailBukuPage() {
     setIsFavorite(false);
   };
 
-  // ==== REQUEST PINJAM BUKU ====
-  const handleRequestPinjam = async () => {
-    if (!user) {
-      alert("Anda harus login terlebih dahulu");
-      router.push("/login");
-      return;
-    }
-
-    if (books.stok <= 0) {
-      alert("Maaf, stok buku habis");
-      return;
-    }
-
-    // Konfirmasi
-    const confirm = window.confirm(
-      `Request peminjaman buku "${books.judul}"?\n\n` +
-      `Durasi: 7 hari\n` +
-      `Status: Menunggu approval admin\n` +
-      `Stok tersisa: ${books.stok}`
-    );
-
-    if (!confirm) return;
-
-    setLoading(true);
-
-    try {
-      const res = await fetch("/api/peminjaman", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id_users: user.id_users,
-          id_buku: id,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.message);
-        return;
-      }
-
-      alert(
-        `✅ ${data.message}\n\n` +
-        `📚 Buku: ${data.data.judul}\n` +
-        `⏳ Status: ${data.data.status}\n` +
-        `📅 Tanggal Request: ${data.data.tanggal_request}\n` +
-        `📅 Estimasi Kembali: ${data.data.estimasi_kembali}\n\n` +
-        `Silakan cek halaman "Peminjaman" untuk melihat status.`
-      );
-
-      // Redirect ke halaman peminjaman
-      setTimeout(() => {
-        router.push("/user/peminjaman");
-      }, 2000);
-
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Terjadi kesalahan saat request peminjaman");
-    } finally {
-      setLoading(false);
-    }
+  const handleLoanSuccess = () => {
+    // after submit, redirect ke peminjaman
+    setTimeout(() => {
+      router.push("/user/homepage/peminjaman");
+    }, 1000);
   };
 
   if (!books) return <p className="p-6">Loading...</p>;
@@ -182,18 +125,24 @@ export default function DetailBukuPage() {
           <div className="flex gap-4 pt-4">
 
             {/* === TOMBOL REQUEST PINJAM === */}
-            <button
-              onClick={handleRequestPinjam}
-              disabled={loading || books.stok <= 0}
-              className={`flex items-center gap-2 py-2 px-4 rounded-lg shadow transition ${
-                loading || books.stok <= 0
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
-              }`}
-            >
-              <BookUser size={20} />
-              {loading ? "Memproses..." : books.stok <= 0 ? "Stok Habis" : "Request Pinjam"}
-            </button>
+            {books.stok <= 0 ? (
+              <button
+                disabled
+                className="flex items-center gap-2 py-2 px-4 rounded-lg shadow bg-gray-400 cursor-not-allowed text-white"
+              >
+                <BookUser size={20} />
+                Stok Habis
+              </button>
+            ) : (
+              <div className="w-[190px]">
+                <LoanModal
+                  bookId={id}
+                  bookTitle={books.judul}
+                  user={user}
+                  onSuccess={handleLoanSuccess}
+                />
+              </div>
+            )}
 
             {/* === TOMBOL FAVORIT === */}
             <button

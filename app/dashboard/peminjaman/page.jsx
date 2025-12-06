@@ -59,10 +59,10 @@ export default function AdminPeminjamanPage() {
       const data = await res.json();
 
       if (res.ok) {
-        alert(`✅ ${data.message}\n\nBuku: ${data.data.judul}\nStatus: ${data.data.status}`);
+        alert(` ${data.message}\n\nBuku: ${data.data.judul}\nStatus: ${data.data.status}`);
         fetchRequests(); // Refresh list
       } else {
-        alert(`❌ ${data.message}`);
+        alert(` ${data.message}`);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -96,10 +96,10 @@ export default function AdminPeminjamanPage() {
       const data = await res.json();
 
       if (res.ok) {
-        alert(`✅ ${data.message}\n\nBuku: ${data.data.judul}\nStatus: ${data.data.status}`);
+        alert(` ${data.message}\n\nBuku: ${data.data.judul}\nStatus: ${data.data.status}`);
         fetchRequests(); // Refresh list
       } else {
-        alert(`❌ ${data.message}`);
+        alert(` ${data.message}`);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -122,13 +122,13 @@ export default function AdminPeminjamanPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">📋 Request Peminjaman Buku</h1>
+        <h1 className="text-2xl font-bold"> Request Peminjaman Buku</h1>
         <Button
           onClick={fetchRequests}
           variant="outline"
           disabled={loading}
         >
-          {loading ? "Loading..." : "🔄 Refresh"}
+          {loading ? "Loading..." : " Refresh"}
         </Button>
       </div>
 
@@ -188,22 +188,22 @@ export default function AdminPeminjamanPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                       <div className="space-y-2">
                         <p className="text-gray-700">
-                          <span className="font-semibold">👤 Peminjam:</span> {item.username}
+                          <span className="font-semibold"> Peminjam:</span> {item.username}
                         </p>
                         <p className="text-gray-600">
-                          <span className="font-semibold">📧 Email:</span> {item.email}
+                          <span className="font-semibold"> Email:</span> {item.email}
                         </p>
                       </div>
 
                       <div className="space-y-2">
                         <p className="text-gray-700">
-                          <span className="font-semibold">📅 Tanggal Request:</span> {formatTanggal(item.tanggal_peminjaman)}
+                          <span className="font-semibold"> Tanggal Request:</span> {formatTanggal(item.tanggal_peminjaman)}
                         </p>
                         <p className="text-gray-700">
-                          <span className="font-semibold">📅 Estimasi Kembali:</span> {formatTanggal(item.tanggal_pengembalian)}
+                          <span className="font-semibold"> Estimasi Kembali:</span> {formatTanggal(item.tanggal_pengembalian)}
                         </p>
                         <p className={`font-semibold ${item.stok > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          📦 Stok: {item.stok} {item.stok <= 0 && "(Habis)"}
+                           Stok: {item.stok} {item.stok <= 0 && "(Habis)"}
                         </p>
                       </div>
                     </div>
@@ -212,7 +212,7 @@ export default function AdminPeminjamanPage() {
                     {item.stok <= 0 && (
                       <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                         <p className="text-red-700 text-sm font-medium">
-                          ⚠️ Stok buku habis. Request tidak bisa disetujui sampai ada stok tersedia.
+                           Stok buku habis. Request tidak bisa disetujui sampai ada stok tersedia.
                         </p>
                       </div>
                     )}
@@ -224,7 +224,7 @@ export default function AdminPeminjamanPage() {
                         disabled={processing === item.id_peminjaman || item.stok <= 0}
                         className="bg-green-600 hover:bg-green-700 text-white"
                       >
-                        {processing === item.id_peminjaman ? "Processing..." : "✅ Setujui"}
+                        {processing === item.id_peminjaman ? "Processing..." : " Setujui"}
                       </Button>
 
                       <Button
@@ -232,7 +232,7 @@ export default function AdminPeminjamanPage() {
                         disabled={processing === item.id_peminjaman}
                         variant="destructive"
                       >
-                        {processing === item.id_peminjaman ? "Processing..." : "❌ Tolak"}
+                        {processing === item.id_peminjaman ? "Processing..." : " Tolak"}
                       </Button>
                     </div>
                   </div>

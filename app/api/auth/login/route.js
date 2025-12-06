@@ -21,7 +21,7 @@ export async function POST(req) {
     );
 
     if (rows.length === 0) {
-      console.log("❌ Email tidak ditemukan");
+      console.log(" Email tidak ditemukan");
       return NextResponse.json(
         { message: "Email tidak ditemukan" },
         { status: 401 }
@@ -33,7 +33,7 @@ export async function POST(req) {
 
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
-      console.log("❌ Password salah");
+      console.log(" Password salah");
       return NextResponse.json(
         { message: "Password salah" },
         { status: 401 }
@@ -73,13 +73,10 @@ export async function POST(req) {
       path: "/",
     });
 
-    console.log("🍪 Cookie set successfully");
-    console.log("================================\n");
-
     return response;
 
   } catch (error) {
-    console.error("❌ LOGIN ERROR:", error);
+    console.error(" LOGIN ERROR:", error);
     return NextResponse.json(
       { message: "Server error" },
       { status: 500 }

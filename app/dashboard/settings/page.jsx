@@ -11,12 +11,6 @@ export default function SettingsPage() {
       onClick: () => console.log("Notification clicked"),
     },
     {
-      title: "Privacy & Security",
-      desc: "Permissions, password, security",
-      icon: <Shield size={20} />,
-      onClick: () => console.log("Privacy clicked"),
-    },
-    {
       title: "Language",
       desc: "Change app language",
       icon: <Globe size={20} />,

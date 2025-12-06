@@ -6,24 +6,68 @@ import Link from "next/link";
 
 export default function FavoritePage() {
   const [favorites, setFavorites] = useState([]);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchFavorites() {
-      const res = await fetch("/api/favorit?user=1");
+    // Ambil user dari localStorage
+    const stored = localStorage.getItem("user");
+    if (stored) {
+      setUser(JSON.parse(stored));
+    } else {
+      setLoading(false);
+    }
+
+    // Re-fetch ketika user di-update
+    const handleUpdate = () => {
+      const updated = localStorage.getItem("user");
+      if (updated) {
+        const parsed = JSON.parse(updated);
+        setUser(parsed);
+        fetchFavorites(parsed.id_users);
+      } else {
+        setUser(null);
+        setFavorites([]);
+      }
+    };
+
+    window.addEventListener("user-updated", handleUpdate);
+    return () => window.removeEventListener("user-updated", handleUpdate);
+  }, []);
+
+  useEffect(() => {
+    if (user?.id_users) {
+      fetchFavorites(user.id_users);
+    }
+  }, [user]);
+
+  const fetchFavorites = async (id_users) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/favorit?user=${id_users}`);
+      if (!res.ok) throw new Error("Gagal memuat favorit");
       const data = await res.json();
       setFavorites(data);
+    } catch (err) {
+      console.error(err);
+      setFavorites([]);
+    } finally {
+      setLoading(false);
     }
-    fetchFavorites();
-  }, []);
+  };
+
+  const emptyState = loading
+    ? "Loading favorites..."
+    : !user
+    ? "Anda belum login."
+    : "You haven't added any favorite books yet.";
 
   return (
     <div className="w-full h-full flex flex-col gap-8">
       <h1 className="text-xl font-bold text-gray-800 mb-2">Favorite Books</h1>
 
       {favorites.length === 0 && (
-        <div className="text-gray-500 text-sm italic">
-          You haven't added any favorite books yet.
-        </div>
+        <div className="text-gray-500 text-sm italic">{emptyState}</div>
       )}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">

@@ -9,9 +9,9 @@ export async function PUT(req, { params }) {
     const { action, id_admin } = await req.json(); // action: 'approve' atau 'reject'
 
     console.log("========== APPROVAL PEMINJAMAN ==========");
-    console.log("📋 Peminjaman ID:", id);
-    console.log("🎯 Action:", action);
-    console.log("👨‍💼 Admin ID:", id_admin);
+    console.log(" Peminjaman ID:", id);
+    console.log(" Action:", action);
+    console.log(" Admin ID:", id_admin);
 
     // === 1. CEK PEMINJAMAN ADA & STATUSNYA ===
     const [peminjamanRows] = await db.query(
@@ -38,8 +38,8 @@ export async function PUT(req, { params }) {
       );
     }
 
-    console.log("📚 Buku:", peminjaman.judul);
-    console.log("📦 Stok saat ini:", peminjaman.stok);
+    console.log(" Buku:", peminjaman.judul);
+    console.log(" Stok saat ini:", peminjaman.stok);
 
     // === 2. PROSES BERDASARKAN ACTION ===
     if (action === 'approve') {
@@ -65,8 +65,8 @@ export async function PUT(req, { params }) {
         [peminjaman.id_book]
       );
 
-      console.log("✅ Request APPROVED");
-      console.log("📦 Stok dikurangi");
+      console.log(" Request APPROVED");
+      console.log(" Stok dikurangi");
 
       return NextResponse.json({
         message: "Request peminjaman disetujui!",
@@ -86,7 +86,7 @@ export async function PUT(req, { params }) {
         [id_admin, id]
       );
 
-      console.log("❌ Request REJECTED");
+      console.log(" Request REJECTED");
 
       return NextResponse.json({
         message: "Request peminjaman ditolak",

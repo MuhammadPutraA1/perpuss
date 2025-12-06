@@ -17,22 +17,22 @@ export default function AdminSidebar({ isOpen, setIsOpen }) {
 
       <ul className="space-y-3">
         <li>
-          <Link href="/dashboard" className="flex items-center gap-3 p-2 hover:bg-gray-700 rounded">
+          <Link href="/dashboard" className="flex items-center gap-3 p-2 hover:bg-green-500 rounded">
             <Home size={20} /> Dashboard
           </Link>
         </li>
         <li>
-          <Link href="/dashboard/peminjaman" className="flex items-center gap-3 p-2 hover:bg-gray-700 rounded">
+          <Link href="/dashboard/peminjaman" className="flex items-center gap-3 p-2 hover:bg-green-500 rounded">
             <Users size={20} /> Kelola Peminjaman
           </Link>
         </li>
         <li>
-          <Link href="/dashboard/buku" className="flex items-center gap-3 p-2 hover:bg-gray-700 rounded">
+          <Link href="/dashboard/buku" className="flex items-center gap-3 p-2 hover:bg-green-500 rounded">
             <Library size={20} /> Kelola buku
           </Link>
         </li>
          <li>
-          <Link href="/dashboard/kelolauser" className="flex items-center gap-3 p-2 hover:bg-gray-700 rounded">
+          <Link href="/dashboard/kelolauser" className="flex items-center gap-3 p-2 hover:bg-green-500 rounded">
             <Users size={20} /> Kelola user
           </Link>
         </li>

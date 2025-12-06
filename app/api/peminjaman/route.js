@@ -5,7 +5,12 @@ import getDb from "@/app/lib/database";
 export async function POST(req) {
   try {
     const db = await getDb();
-    const { id_users, id_buku } = await req.json();
+    const {
+      id_users,
+      id_buku,
+      tanggal_pinjam: tanggalPinjamInput,
+      tanggal_kembali: tanggalKembaliInput,
+    } = await req.json();
 
     console.log("========== PEMINJAMAN REQUEST ==========");
     console.log("👤 User ID:", id_users);
@@ -54,14 +59,27 @@ export async function POST(req) {
       );
     }
 
-    // === 3. HITUNG TANGGAL (estimasi) ===
-    const tanggalPinjam = new Date();
-    const tanggalKembali = new Date();
-    tanggalKembali.setDate(tanggalKembali.getDate() + 7); // 7 hari dari sekarang
+    // === 3. HITUNG TANGGAL (pakai input jika ada, default 7 hari) ===
+    const formatTanggal = (date) => date.toISOString().split("T")[0];
 
-    const formatTanggal = (date) => {
-      return date.toISOString().split("T")[0];
-    };
+    const tanggalPinjam = tanggalPinjamInput
+      ? new Date(tanggalPinjamInput)
+      : new Date();
+
+    const tanggalKembali = tanggalKembaliInput
+      ? new Date(tanggalKembaliInput)
+      : (() => {
+          const d = new Date();
+          d.setDate(d.getDate() + 7); // default 7 hari
+          return d;
+        })();
+
+    if (Number.isNaN(tanggalPinjam.getTime()) || Number.isNaN(tanggalKembali.getTime())) {
+      return NextResponse.json(
+        { message: "Format tanggal tidak valid" },
+        { status: 400 }
+      );
+    }
 
     console.log("📅 Tanggal Request:", formatTanggal(tanggalPinjam));
     console.log("📅 Estimasi Kembali:", formatTanggal(tanggalKembali));

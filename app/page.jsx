@@ -62,6 +62,7 @@ export default function HomePage() {
 
             <p className="text-gray-500 text-lg max-w-md">
             A library is more than just a place to borrow books—it is a vibrant learning space where knowledge, creativity, and curiosity come together. It provides access to a wide collection of books, digital resources, journals, and multimedia materials that support students, teachers, and the entire community. </p>
+            
             <Button>See All </Button>
           </div>
 

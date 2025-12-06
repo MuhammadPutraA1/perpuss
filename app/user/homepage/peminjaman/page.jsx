@@ -56,18 +56,18 @@ export default function PeminjamanUserPage() {
 
       if (res.ok) {
         alert(
-          `✅ ${data.message}\n\n` +
-          `📚 Buku: ${data.data.judul}\n` +
-          `📅 Dikembalikan: ${data.data.tanggal_pengembalian_aktual}\n` +
+          `${data.message}\n\n` +
+          ` Buku: ${data.data.judul}\n` +
+          ` Dikembalikan: ${data.data.tanggal_pengembalian_aktual}\n` +
           (data.data.keterlambatan > 0 
-            ? `⚠️ Keterlambatan: ${data.data.keterlambatan} hari` 
-            : `✅ Tepat waktu!`)
+            ? ` Keterlambatan: ${data.data.keterlambatan} hari` 
+            : ` Tepat waktu!`)
         );
 
         // Refresh data
         fetchPeminjaman();
       } else {
-        alert(`❌ ${data.message}`);
+        alert(` ${data.message}`);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -105,13 +105,13 @@ export default function PeminjamanUserPage() {
           badge: (
             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-600 text-white flex items-center gap-1 w-fit">
               <AlertTriangle size={14} />
-              ⚠️ Terlambat {Math.abs(sisaHari)} hari
+               Terlambat {Math.abs(sisaHari)} hari
             </span>
           ),
           detail: (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-2">
               <p className="text-red-800 text-sm font-semibold">
-                ⚠️ Buku Anda sudah terlambat {Math.abs(sisaHari)} hari!
+                 Buku Anda sudah terlambat {Math.abs(sisaHari)} hari!
               </p>
               <p className="text-red-600 text-xs mt-1">
                 Harap segera kembalikan untuk menghindari denda atau sanksi.
@@ -125,13 +125,13 @@ export default function PeminjamanUserPage() {
           badge: (
             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800 flex items-center gap-1 w-fit">
               <Clock size={14} />
-              ⏰ {sisaHari} hari lagi
+               {sisaHari} hari lagi
             </span>
           ),
           detail: (
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mt-2">
               <p className="text-orange-800 text-sm font-semibold">
-                ⏰ Deadline {sisaHari} hari lagi!
+                 Deadline {sisaHari} hari lagi!
               </p>
               <p className="text-orange-600 text-xs mt-1">
                 Segera kembalikan sebelum tanggal {new Date(tanggal_pengembalian).toLocaleDateString("id-ID")}.
@@ -144,7 +144,7 @@ export default function PeminjamanUserPage() {
         return {
           badge: (
             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-              ✅ Sedang Dipinjam ({sisaHari} hari lagi)
+               Sedang Dipinjam ({sisaHari} hari lagi)
             </span>
           ),
           detail: null,
@@ -157,7 +157,7 @@ export default function PeminjamanUserPage() {
       tertunda: {
         badge: (
           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
-            ⏳ Menunggu Approval
+             Menunggu Approval
           </span>
         ),
         detail: null,
@@ -166,7 +166,7 @@ export default function PeminjamanUserPage() {
       dikembalikan: {
         badge: (
           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
-            📚 Dikembalikan
+             Dikembalikan
           </span>
         ),
         detail: null,
@@ -175,7 +175,7 @@ export default function PeminjamanUserPage() {
       terlambat: {
         badge: (
           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
-            📚 Dikembalikan (Terlambat)
+             Dikembalikan (Terlambat)
           </span>
         ),
         detail: null,
@@ -184,7 +184,7 @@ export default function PeminjamanUserPage() {
       ditolak: {
         badge: (
           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
-            ❌ Ditolak
+             Ditolak
           </span>
         ),
         detail: null,
@@ -226,7 +226,7 @@ export default function PeminjamanUserPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">📚 Peminjaman Buku Saya</h1>
+      <h1 className="text-2xl font-bold mb-6"> Peminjaman Buku Saya</h1>
 
       {stats.terlambat > 0 && (
         <div className="bg-red-50 border-l-4 border-red-600 p-4 mb-6 rounded">
@@ -306,12 +306,12 @@ export default function PeminjamanUserPage() {
                       {statusInfo.badge}
 
                       <div className="text-xs text-gray-500 space-y-1 mt-2">
-                        <p>📅 Pinjam: {formatTanggal(item.tanggal_peminjaman)}</p>
+                        <p> Pinjam: {formatTanggal(item.tanggal_peminjaman)}</p>
                         <p className={statusInfo.priority === 1 ? 'text-red-600 font-semibold' : ''}>
-                          📅 Kembali: {formatTanggal(item.tanggal_pengembalian)}
+                           Kembali: {formatTanggal(item.tanggal_pengembalian)}
                         </p>
                         {item.pengembalian && (
-                          <p>✅ Dikembalikan: {formatTanggal(item.pengembalian)}</p>
+                          <p> Dikembalikan: {formatTanggal(item.pengembalian)}</p>
                         )}
                       </div>
 
@@ -325,7 +325,7 @@ export default function PeminjamanUserPage() {
                           className="w-full mt-3 bg-blue-600 hover:bg-blue-700"
                           size="sm"
                         >
-                          {returning === item.id_peminjaman ? "Processing..." : "📤 Kembalikan Buku"}
+                          {returning === item.id_peminjaman ? "Processing..." : " Kembalikan Buku"}
                         </Button>
                       )}
                     </div>

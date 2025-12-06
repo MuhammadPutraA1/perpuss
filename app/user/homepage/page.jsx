@@ -7,10 +7,22 @@ import Link from "next/link";
 
 export default function HomePage() {
   const [books, setBooks] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadingFav, setLoadingFav] = useState(true);
 
-  // ambil data buku
+  // ambil user + data buku & favorit
   useEffect(() => {
+    const saved = localStorage.getItem("user");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setUser(parsed);
+      fetchFavorites(parsed.id_users);
+    } else {
+      setLoadingFav(false);
+    }
+
     const getBooks = async () => {
       try {
         const res = await fetch("/api/buku?limit=3");
@@ -24,6 +36,21 @@ export default function HomePage() {
     };
     getBooks();
   }, []);
+
+  const fetchFavorites = async (userId) => {
+    try {
+      setLoadingFav(true);
+      const res = await fetch(`/api/favorit?user=${userId}`);
+      if (!res.ok) throw new Error("Gagal memuat favorit");
+      const data = await res.json();
+      setFavorites(data);
+    } catch (err) {
+      console.error("error fetch favorit:", err);
+      setFavorites([]);
+    } finally {
+      setLoadingFav(false);
+    }
+  };
 
   return (
     <div className="w-full min-h-screen bg-gray-100 p-4 lg:p-6 flex flex-col lg:flex-row gap-4 lg:gap-6">
@@ -45,22 +72,11 @@ export default function HomePage() {
             </button>
 
             <Link
-              href="/user/homepage/booklist"
+              href="/user/homepage/buku"
               className="text-sm text-teal-600 hover:underline font-medium"
             >
               See All
             </Link>
-          </div>
-
-          {/* 🔹 Desktop header kanan */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center bg-gray-100 px-4 py-2 rounded-xl gap-2 w-full lg:w-[270px]">
-              <Search size={18} className="text-gray-500" />
-              <input
-                className="bg-transparent outline-none text-sm w-full"
-                placeholder="Search for title, author, tags, etc"
-              />
-            </div>
           </div>
         </div>
 
@@ -91,13 +107,50 @@ export default function HomePage() {
         )}
 
         {/* buku user */}
-        <h3 className="mt-8 text-lg font-semibold text-gray-700">Your Books</h3>
+        <div className="mt-8 mb-2 flex items-center gap-3">
+          <h3 className="text-lg font-semibold text-gray-700">Your Books</h3>
+          <Link
+            href="/user/homepage/favorite"
+            className="text-sm text-teal-600 hover:underline font-medium"
+          >
+            See All
+          </Link>
+        </div>
 
         <div className="mt-4 flex flex-col gap-4">
-          <Card className="p-4 flex justify-between items-center border-2 border-dashed text-gray-400">
-            <p>No books borrowed yet</p>
-            <Button>See All</Button>
-          </Card>
+          {loadingFav ? (
+            <Card className="p-4 text-gray-500">Loading your favorites...</Card>
+          ) : !user ? (
+            <Card className="p-4 flex justify-between items-center border-2 border-dashed text-gray-400">
+              <p>Silakan login untuk melihat favorit Anda</p>
+            </Card>
+          ) : favorites.length === 0 ? (
+            <Card className="p-4 flex justify-between items-center border-2 border-dashed text-gray-400">
+              <p>Belum ada favorit</p>
+            </Card>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {favorites.slice(0, 3).map((book) => (
+                  <Link key={book.id_buku} href={`/user/homepage/buku/${book.id_buku}`}>
+                    <Card className="shadow overflow-hidden hover:scale-[1.02] transition p-0 border">
+                      <img
+                        src={`/buku/coverbuku/${book.gambar || "default.jpg"}`}
+                        alt={book.judul}
+                        className="w-full h-48 object-cover"
+                      />
+                      <CardContent className="p-3">
+                        <h3 className="font-semibold text-gray-800 text-sm truncate">
+                          {book.judul}
+                        </h3>
+                        <p className="text-gray-500 text-xs">{book.penulis}</p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </main>
     </div>
